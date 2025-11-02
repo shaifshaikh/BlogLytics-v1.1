@@ -1,0 +1,280 @@
+﻿@model Registration.Models.InterestSelectionViewModel
+
+@{
+    ViewData["Title"] = "Select Your Interests";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .interest-container {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        .header-section {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+            .header-section h1 {
+                font-size: 2.5rem;
+                font-weight: 700;
+                margin-bottom: 10px;
+            }
+
+            .header-section p {
+                font-size: 1.1rem;
+                opacity: 0.9;
+            }
+
+        .interest-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+            .interest-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            }
+
+            .interest-card.selected {
+                border-color: #667eea;
+                background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            }
+
+        .interest-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .interest-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .interest-description {
+            font-size: 0.95rem;
+            color: #666;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 15px 50px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+            .submit-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+            }
+
+            .submit-btn:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+            }
+
+        .submit-section {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .checkmark {
+            display: none;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: #667eea;
+            font-size: 1.5rem;
+        }
+
+        .interest-card.selected .checkmark {
+            display: block;
+        }
+
+        .color-tech {
+            color: #3498db;
+        }
+
+        .color-sports {
+            color: #e74c3c;
+        }
+
+        .color-art {
+            color: #9b59b6;
+        }
+
+        .color-music {
+            color: #e67e22;
+        }
+
+        .color-food {
+            color: #27ae60;
+        }
+
+        .color-travel {
+            color: #16a085;
+        }
+
+        .color-default {
+            color: #667eea;
+        }
+
+        .btn-skip {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+            padding: 8px 20px;
+            font-weight: 500;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+            .btn-skip:hover {
+                background: white;
+                color: #667eea;
+                transform: translateY(-2px);
+            }
+
+        @@media (max-width: 576px) {
+            .btn-skip {
+                top: 10px;
+                right: 10px;
+                padding: 6px 15px;
+                font-size: 0.9rem;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="interest-container">
+        @* <div class="header-section">
+            <h1>Welcome! 👋</h1>
+            <p>Select your interests to personalize your experience (Choose at least one)</p>
+        </div> *@
+        <div class="header-section position-relative">
+            <button class="btn-skip" id="skip" onclick="location.href='@Url.Action("SkipInterests", "DashBoard")'">Skip</button>
+            <h1>Welcome! 👋</h1>
+            <p>Select your interests to personalize your experience (Choose at least one)</p>
+
+            @if (TempData["Skip"] != null)
+            {
+                <div class="alert alert-success">
+                    @TempData["Skip"]
+                </div>
+            }
+        </div>
+       
+        <div class="row" id="interestCardsContainer">
+            @foreach (var category in Model.Categories)
+            {
+                <div class="col-md-4 col-sm-6">
+                    <div class="interest-card" data-category-id="@category.CategoryId">
+                        <i class="checkmark fas fa-check-circle"></i>
+                        <i class="interest-icon @(string.IsNullOrEmpty(category.IconClass) ? "fas fa-star" : category.IconClass) @(string.IsNullOrEmpty(category.ColorClass) ? "color-default" : category.ColorClass)"></i>
+                        <div class="interest-title">@category.CategoryName</div>
+                        <div class="interest-description">@(string.IsNullOrEmpty(category.Description) ? "Explore " + category.CategoryName : category.Description)</div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="submit-section">
+            <button class="submit-btn" id="submitBtn" disabled onclick="submitInterests()">
+                Continue to Dashboard
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let selectedCategories = [];
+
+        // Add click event to all interest cards
+        document.querySelectorAll('.interest-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const categoryId = parseInt(this.getAttribute('data-category-id'));
+
+                if (this.classList.contains('selected')) {
+                    this.classList.remove('selected');
+                    selectedCategories = selectedCategories.filter(id => id !== categoryId);
+                } else {
+                    this.classList.add('selected');
+                    selectedCategories.push(categoryId);
+                }
+
+                // Enable/disable submit button
+                document.getElementById('submitBtn').disabled = selectedCategories.length === 0;
+            });
+        });
+
+        async function submitInterests() {
+            if (selectedCategories.length === 0) {
+                alert('Please select at least one interest');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Saving...';
+
+            try {
+                const response = await fetch('@Url.Action("SaveInterests", "DashBoard")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(selectedCategories)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    window.location.href = '@Url.Action("Dashboard", "DashBoard")';
+                } else {
+                    alert(result.message);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Continue to Dashboard';
+                }
+            } catch (error) {
+                alert('An error occurred. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Continue to Dashboard';
+            }
+        }
+    </script>
+</body>
+</html>
