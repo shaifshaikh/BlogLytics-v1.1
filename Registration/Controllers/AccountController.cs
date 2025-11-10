@@ -32,7 +32,6 @@ namespace Registration.Controllers
 
         [HttpGet]
         public IActionResult Login()
-
         {
             if (HttpContext.Session.GetString("UserId") != null)
             {
@@ -256,7 +255,7 @@ namespace Registration.Controllers
                 Token = token
             };
 
-            return View(model);
+            return View();
         }
 
 
