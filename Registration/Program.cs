@@ -15,6 +15,14 @@ builder.Services.AddTransient<ICreateUser, CreateUser>();
 builder.Services.AddTransient<IResetPassword, ResetPassword>();
 builder.Services.AddTransient<IUserInterestRepository, UserInterestRepository>();
 
+
+// Register NEW blog-related repositories
+builder.Services.AddTransient<IBlogRepository, BlogRepository>();
+builder.Services.AddTransient<IUserActionRepository, UserActionRepository>();
+builder.Services.AddTransient<ICommentRepository, CommentRepository>();
+builder.Services.AddTransient<IFollowRepository, FollowRepository>();
+builder.Services.AddTransient<IReportRepository, ReportRepository>();
+
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromHours(2);

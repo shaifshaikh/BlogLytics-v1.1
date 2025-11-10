@@ -1,27 +1,128 @@
-﻿
-@* @model DashboardViewModel *@
-@{
+﻿@{
     ViewData["Title"] = "Dashboard - Bloglytics";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@section styles{
+@section styles {
     <style>
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
+        .welcome-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+            .welcome-banner h1 {
+                font-size: 36px;
+                margin-bottom: 10px;
+            }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .action-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+            .action-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            }
+
+            .action-card i {
+                font-size: 48px;
+                color: #667eea;
+                margin-bottom: 15px;
+            }
+
+            .action-card h3 {
+                font-size: 20px;
+                margin-bottom: 10px;
+                color: #333;
+            }
+
+            .action-card p {
+                color: #666;
+                font-size: 14px;
+            }
     </style>
 }
 
+<div class="dashboard-container">
+    <div class="welcome-banner">
+        <h1>Welcome to Bloglytics! 🎉</h1>
+        <p>Your personalized content hub</p>
+    </div>
 
+    <div class="quick-actions">
+        <div class="action-card" onclick="location.href='@Url.Action("Index", "Blog")'">
+            <i class="fas fa-home"></i>
+            <h3>Browse Feed</h3>
+            <p>See personalized content based on your interests</p>
+        </div>
 
+        <div class="action-card" onclick="location.href='@Url.Action("Create", "Blog")'">
+            <i class="fas fa-pen-fancy"></i>
+            <h3>Create Blog</h3>
+            <p>Share your thoughts with the community</p>
+        </div>
 
-@section scripts{
+        <div class="action-card" onclick="location.href='@Url.Action("MyBlogs", "Blog")'">
+            <i class="fas fa-book"></i>
+            <h3>My Blogs</h3>
+            <p>View and manage your published content</p>
+        </div>
+
+        <div class="action-card" onclick="location.href='@Url.Action("Trending", "Blog")'">
+            <i class="fas fa-fire"></i>
+            <h3>Trending</h3>
+            <p>See what's popular right now</p>
+        </div>
+    </div>
+</div>
+
+@section scripts {
     <script>
+        // Auto-redirect to feed after 2 seconds
+        setTimeout(function() {
+            window.location.href = '@Url.Action("Index", "Blog")';
+        }, 2000);
     </script>
 }
-    
+```
 
+@* ---
 
+## **Step 17: Update Layout Navigation**
 
+Update the navigation in **Views/Shared/_Layout.cshtml** to include Blog links (already done in the layout I shared earlier).
 
+---
 
+## **🎯 Final Setup Checklist:**
 
+### **1. Create wwwroot/uploads folder structure:**
+```
+wwwroot/
+├── uploads/
+│   └── blogs/
+└── images/
+    └── default-avatar.png *@

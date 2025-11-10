@@ -1,0 +1,299 @@
+﻿@model List<Registration.Models.Blog>
+@{
+    ViewData["Title"] = "My Blogs - Bloglytics";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <style>
+        .my-blogs-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .my-blogs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .my-blogs-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .btn-create-new {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .btn-create-new:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .my-blogs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .my-blog-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .my-blog-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .my-blog-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .my-blog-content {
+            padding: 20px;
+        }
+
+        .my-blog-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+            cursor: pointer;
+            line-height: 1.3;
+        }
+
+            .my-blog-title:hover {
+                color: #667eea;
+            }
+
+        .my-blog-excerpt {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .my-blog-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .meta-stats {
+            display: flex;
+            gap: 15px;
+            font-size: 13px;
+            color: #999;
+        }
+
+        .meta-stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .my-blog-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-edit, .btn-delete {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .btn-edit {
+            background: #667eea;
+            color: white;
+        }
+
+            .btn-edit:hover {
+                background: #5568d3;
+            }
+
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+        }
+
+            .btn-delete:hover {
+                background: #c0392b;
+            }
+
+        .no-blogs-message {
+            text-align: center;
+            padding: 80px 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+            .no-blogs-message i {
+                font-size: 80px;
+                color: #e0e0e0;
+                margin-bottom: 20px;
+            }
+
+            .no-blogs-message h2 {
+                font-size: 24px;
+                color: #666;
+                margin-bottom: 15px;
+            }
+
+            .no-blogs-message p {
+                color: #999;
+                margin-bottom: 30px;
+            }
+    </style>
+}
+
+<div class="my-blogs-container">
+    <div class="my-blogs-header">
+        <h1>My Blogs (@Model.Count)</h1>
+        <a href="@Url.Action("Create", "Blog")" class="btn-create-new">
+            <i class="fas fa-plus"></i> Create New Blog
+        </a>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="my-blogs-grid" id="myBlogsGrid">
+            @foreach (var blog in Model)
+            {
+                <div class="my-blog-card" data-blog-id="@blog.BlogId">
+                    @if (!string.IsNullOrEmpty(blog.ImageUrl))
+                    {
+                        <img src="@blog.ImageUrl" class="my-blog-image" alt="@blog.Title">
+                    }
+                    else
+                    {
+                        <div class="my-blog-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 60px;">
+                            <i class="fas fa-blog"></i>
+                        </div>
+                    }
+
+                    <div class="my-blog-content">
+                        <h3 class="my-blog-title" onclick="viewBlog(@blog.BlogId)">
+                            @blog.Title
+                        </h3>
+                        <p class="my-blog-excerpt">
+                            @(blog.Content.Length > 150 ? blog.Content.Substring(0, 150) + "..." : blog.Content)
+                        </p>
+
+                        <div class="my-blog-meta">
+                            <div class="meta-stats">
+                                <div class="meta-stat">
+                                    <i class="fas fa-eye"></i>
+                                    <span>@blog.ViewCount</span>
+                                </div>
+                                <div class="meta-stat">
+                                    <i class="fas fa-heart"></i>
+                                    <span>@blog.LikeCount</span>
+                                </div>
+                                <div class="meta-stat">
+                                    <i class="fas fa-comment"></i>
+                                    <span>@blog.CommentCount</span>
+                                </div>
+                            </div>
+
+                            <div class="my-blog-actions">
+                                <button class="btn-edit" onclick="editBlog(@blog.BlogId)">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="btn-delete" onclick="deleteBlog(@blog.BlogId)">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="no-blogs-message">
+            <i class="fas fa-pen-fancy"></i>
+            <h2>You haven't created any blogs yet</h2>
+            <p>Start sharing your thoughts and ideas with the community!</p>
+            <a href="@Url.Action("Create", "Blog")" class="btn-create-new">
+                <i class="fas fa-plus"></i> Create Your First Blog
+            </a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function viewBlog(blogId) {
+            window.location.href = `/Blog/Details/${blogId}`;
+        }
+
+        function editBlog(blogId) {
+            window.location.href = `/Blog/Edit/${blogId}`;
+        }
+
+        function deleteBlog(blogId) {
+            if (confirm('Are you sure you want to delete this blog? This action cannot be undone.')) {
+                $.ajax({
+                    url: '/Blog/Delete',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(blogId),
+                    success: function(response) {
+                        if (response.success) {
+                            // Remove the card from UI
+                            $(`.my-blog-card[data-blog-id="${blogId}"]`).fadeOut(300, function() {
+                                $(this).remove();
+
+                                // Check if no blogs left
+                                if ($('.my-blog-card').length === 0) {
+                                    location.reload();
+                                }
+                            });
+
+                            alert('Blog deleted successfully!');
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function() {
+                        alert('Error deleting blog');
+                    }
+                });
+            }
+        }
+    </script>
+}

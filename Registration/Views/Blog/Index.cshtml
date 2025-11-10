@@ -1,0 +1,774 @@
+﻿@{
+    ViewData["Title"] = "Feed - Bloglytics";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <style>
+        .feed-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+
+        .filter-tab {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .filter-tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .filter-tab:hover {
+            color: #667eea;
+        }
+
+        .blog-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .blog-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .blog-header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .author-info {
+            flex: 1;
+        }
+
+        .author-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 3px;
+        }
+
+        .blog-meta {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .follow-btn {
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .follow-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .follow-btn.following {
+            background: #667eea;
+            color: white;
+        }
+
+        .blog-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+        }
+
+        .blog-content {
+            padding: 20px;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .blog-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+
+        .blog-title:hover {
+            color: #667eea;
+        }
+
+        .blog-excerpt {
+            color: #666;
+            line-height: 1.6;
+            margin: 15px 0;
+        }
+
+        .blog-actions {
+            display: flex;
+            gap: 20px;
+            padding: 15px 20px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #666;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            background: #f5f5f5;
+            color: #667eea;
+        }
+
+        .action-btn.liked {
+            color: #e74c3c;
+        }
+
+        .action-btn i {
+            font-size: 18px;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @@keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .no-blogs {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .no-blogs i {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        /* Comment Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+        }
+
+        .close-btn {
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .comment-textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .comment-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-cancel, .btn-submit {
+            padding: 10px 25px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-cancel {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Report Modal Styles */
+        .report-reasons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .report-reason {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .report-reason:hover {
+            border-color: #667eea;
+            background: #f8f9fa;
+        }
+
+        .report-reason input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .report-description {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 80px;
+        }
+    </style>
+}
+
+<div class="feed-container">
+    <div class="filter-tabs">
+        <button class="filter-tab active" data-filter="all">
+            <i class="fas fa-home"></i> For You
+        </button>
+        <button class="filter-tab" data-filter="trending">
+            <i class="fas fa-fire"></i> Trending
+        </button>
+        <button class="filter-tab" data-filter="following">
+            <i class="fas fa-users"></i> Following
+        </button>
+    </div>
+
+    <div id="feedContainer">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Loading your feed...</p>
+        </div>
+    </div>
+</div>
+
+<!-- Comment Modal -->
+<div id="commentModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Add Comment</h3>
+            <span class="close-btn" onclick="closeCommentModal()">&times;</span>
+        </div>
+        <textarea id="commentText" class="comment-textarea" placeholder="Write your comment..."></textarea>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeCommentModal()">Cancel</button>
+            <button class="btn-submit" onclick="submitComment()">Post Comment</button>
+        </div>
+    </div>
+</div>
+
+<!-- Report Modal -->
+<div id="reportModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Report Content</h3>
+            <span class="close-btn" onclick="closeReportModal()">&times;</span>
+        </div>
+        <div class="report-reasons">
+            <label class="report-reason">
+                <input type="radio" name="reportReason" value="spam">
+                <span>Spam or misleading</span>
+            </label>
+            <label class="report-reason">
+                <input type="radio" name="reportReason" value="harassment">
+                <span>Harassment or bullying</span>
+            </label>
+            <label class="report-reason">
+                <input type="radio" name="reportReason" value="misinformation">
+                <span>False information</span>
+            </label>
+            <label class="report-reason">
+                <input type="radio" name="reportReason" value="adult_content">
+                <span>Adult content</span>
+            </label>
+            <label class="report-reason">
+                <input type="radio" name="reportReason" value="violence">
+                <span>Violence or dangerous content</span>
+            </label>
+            <label class="report-reason">
+                <input type="radio" name="reportReason" value="hate_speech">
+                <span>Hate speech</span>
+            </label>
+            <label class="report-reason">
+                <input type="radio" name="reportReason" value="other">
+                <span>Other</span>
+            </label>
+        </div>
+        <textarea id="reportDescription" class="report-description" placeholder="Additional details (optional)..."></textarea>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeReportModal()">Cancel</button>
+            <button class="btn-submit" onclick="submitReport()">Submit Report</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let currentPage = 1;
+        let currentFilter = 'all';
+        let isLoading = false;
+        let hasNextPage = true;
+        let currentBlogId = null;
+        let currentReportData = {};
+
+        $(document).ready(function() {
+            loadFeed();
+
+            // Filter tabs
+            $('.filter-tab').click(function() {
+                $('.filter-tab').removeClass('active');
+                $(this).addClass('active');
+                currentFilter = $(this).data('filter');
+                currentPage = 1;
+                $('#feedContainer').html('<div class="loading-spinner"><div class="spinner"></div><p>Loading...</p></div>');
+                loadFeed();
+            });
+
+            // Infinite scroll
+            $(window).scroll(function() {
+                if ($(window).scrollTop() + $(window).height() > $(document).height() - 500) {
+                    if (!isLoading && hasNextPage) {
+                        currentPage++;
+                        loadFeed(true);
+                    }
+                }
+            });
+        });
+
+        function loadFeed(append = false) {
+            if (isLoading) return;
+            isLoading = true;
+
+            let endpoint = '/Blog/GetFeed';
+            if (currentFilter === 'trending') {
+                endpoint = '/Blog/Trending';
+            }
+
+            $.ajax({
+                url: endpoint,
+                type: 'GET',
+                data: { page: currentPage, pageSize: 10 },
+                success: function(response) {
+                    if (response.success) {
+                        if (!append) {
+                            $('#feedContainer').html('');
+                        }
+
+                        if (response.blogs.length === 0 && currentPage === 1) {
+                            $('#feedContainer').html(`
+                                <div class="no-blogs">
+                                    <i class="fas fa-newspaper"></i>
+                                    <h3>No blogs yet</h3>
+                                    <p>Start creating content or follow users to see their blogs here!</p>
+                                </div>
+                            `);
+                        } else {
+                            response.blogs.forEach(blog => {
+                                renderBlogCard(blog);
+                            });
+                        }
+
+                        hasNextPage = response.hasNextPage;
+                    } else {
+                        alert(response.message);
+                    }
+                    isLoading = false;
+                },
+                error: function(xhr) {
+                    alert('Error loading feed');
+                    isLoading = false;
+                }
+            });
+        }
+
+        function renderBlogCard(blog) {
+            const excerpt = blog.content.length > 200 ? blog.content.substring(0, 200) + '...' : blog.content;
+            const imageHtml = blog.imageUrl ? `<img src="${blog.imageUrl}" class="blog-image" alt="${blog.title}">` : '';
+            const avatarUrl = blog.authorProfilePicture || '/images/default-avatar.png';
+            
+            const cardHtml = `
+                <div class="blog-card" data-blog-id="${blog.blogId}">
+                    <div class="blog-header">
+                        <img src="${avatarUrl}" class="author-avatar" alt="${blog.authorName}">
+                        <div class="author-info">
+                            <div class="author-name">${blog.authorName}</div>
+                            <div class="blog-meta">
+                                ${formatDate(blog.createdAt)} · ${blog.viewCount} views
+                            </div>
+                        </div>
+                        <button class="follow-btn ${blog.isFollowingAuthor ? 'following' : ''}" 
+                                onclick="toggleFollow(${blog.userId}, this)" 
+                                data-user-id="${blog.userId}">
+                            ${blog.isFollowingAuthor ? 'Following' : 'Follow'}
+                        </button>
+                    </div>
+
+                    ${imageHtml}
+
+                    <div class="blog-content">
+                        <span class="category-badge">${blog.categoryName}</span>
+                        <h2 class="blog-title" onclick="viewBlog(${blog.blogId})">${blog.title}</h2>
+                        <p class="blog-excerpt">${excerpt}</p>
+                    </div>
+
+                    <div class="blog-actions">
+                        <button class="action-btn ${blog.isLikedByCurrentUser ? 'liked' : ''}" 
+                                onclick="toggleLike(${blog.blogId}, this)">
+                            <i class="fas fa-heart"></i>
+                            <span class="like-count">${blog.likeCount}</span>
+                        </button>
+                        <button class="action-btn" onclick="openCommentModal(${blog.blogId})">
+                            <i class="fas fa-comment"></i>
+                            <span>${blog.commentCount}</span>
+                        </button>
+                        <button class="action-btn" onclick="sharePost(${blog.blogId})">
+                            <i class="fas fa-share"></i>
+                            <span>${blog.shareCount}</span>
+                        </button>
+                        <button class="action-btn" onclick="openReportModal(${blog.blogId}, ${blog.userId})">
+                            <i class="fas fa-flag"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            $('#feedContainer').append(cardHtml);
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = Math.floor((now - date) / 1000); // seconds
+
+            if (diff < 60) return 'Just now';
+            if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+            if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+            if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+            
+            return date.toLocaleDateString();
+        }
+
+        function viewBlog(blogId) {
+            window.location.href = `/Blog/Details/${blogId}`;
+        }
+
+        // ==================== LIKE FUNCTIONALITY ====================
+        function toggleLike(blogId, button) {
+            const isLiked = $(button).hasClass('liked');
+            const endpoint = isLiked ? '/Blog/Unlike' : '/Blog/Like';
+
+            $.ajax({
+                url: endpoint,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(blogId),
+                success: function(response) {
+                    if (response.success) {
+                        if (isLiked) {
+                            $(button).removeClass('liked');
+                            const count = parseInt($(button).find('.like-count').text());
+                            $(button).find('.like-count').text(count - 1);
+                        } else {
+                            $(button).addClass('liked');
+                            const count = parseInt($(button).find('.like-count').text());
+                            $(button).find('.like-count').text(count + 1);
+                        }
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function() {
+                    alert('Error processing like');
+                }
+            });
+        }
+
+        // ==================== COMMENT FUNCTIONALITY ====================
+        function openCommentModal(blogId) {
+            currentBlogId = blogId;
+            $('#commentText').val('');
+            $('#commentModal').fadeIn();
+        }
+
+        function closeCommentModal() {
+            $('#commentModal').fadeOut();
+            currentBlogId = null;
+        }
+
+        function submitComment() {
+            const content = $('#commentText').val().trim();
+            
+            if (!content) {
+                alert('Please enter a comment');
+                return;
+            }
+
+            const commentData = {
+                blogId: currentBlogId,
+                content: content
+            };
+
+            $.ajax({
+                url: '/Blog/AddComment',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(commentData),
+                success: function(response) {
+                    if (response.success) {
+                        // Update comment count
+                        const card = $(`.blog-card[data-blog-id="${currentBlogId}"]`);
+                        const commentBtn = card.find('.action-btn').eq(1);
+                        const currentCount = parseInt(commentBtn.find('span').text());
+                        commentBtn.find('span').text(currentCount + 1);
+
+                        closeCommentModal();
+                        alert('Comment added successfully!');
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function() {
+                    alert('Error adding comment');
+                }
+            });
+        }
+      
+
+
+        ==================== SHARE FUNCTIONALITY ====================
+        function sharePost(blogId) {
+            const blogUrl = `${window.location.origin}/Blog/Details/${blogId}`;
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(blogUrl).then(function() {
+                // Record share action
+                $.ajax({
+                    url: '/Blog/RecordShare',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(blogId),
+                    success: function(response) {
+                        if (response.success) {
+                            // Update share count
+                            const card = $(`.blog-card[data-blog-id="${blogId}"]`);
+                            const shareBtn = card.find('.action-btn').eq(2);
+                            const currentCount = parseInt(shareBtn.find('span').text());
+                            shareBtn.find('span').text(currentCount + 1);
+
+                            // Show success message
+                            alert('Link copied to clipboard!');
+                        }
+                    }
+                });
+            }).catch(function() {
+                alert('Failed to copy link');
+            });
+        }
+
+        // ==================== FOLLOW FUNCTIONALITY ====================
+        function toggleFollow(authorUserId, button) {
+            const isFollowing = $(button).hasClass('following');
+            const endpoint = isFollowing ? '/Blog/UnfollowUser' : '/Blog/FollowUser';
+
+            $.ajax({
+                url: endpoint,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(authorUserId),
+                success: function(response) {
+                    if (response.success) {
+                        if (isFollowing) {
+                            $(button).removeClass('following').text('Follow');
+                        } else {
+                            $(button).addClass('following').text('Following');
+                        }
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function() {
+                    alert('Error processing follow request');
+                }
+            });
+        }
+
+        // ==================== REPORT FUNCTIONALITY ====================
+        function openReportModal(blogId, reportedUserId) {
+            currentReportData = {
+                blogId: blogId,
+                reportedUserId: reportedUserId
+            };
+            $('input[name="reportReason"]').prop('checked', false);
+            $('#reportDescription').val('');
+            $('#reportModal').fadeIn();
+        }
+
+        function closeReportModal() {
+            $('#reportModal').fadeOut();
+            currentReportData = {};
+        }
+
+        function submitReport() {
+            const selectedReason = $('input[name="reportReason"]:checked').val();
+
+            if (!selectedReason) {
+                alert('Please select a reason for reporting');
+                return;
+            }
+
+            const reportData = {
+                blogId: currentReportData.blogId,
+                reportedUserId: currentReportData.reportedUserId,
+                reason: selectedReason,
+                description: $('#reportDescription').val()
+            };
+
+            $.ajax({
+                url: '/Blog/ReportContent',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(reportData),
+                success: function(response) {
+                    if (response.success) {
+                        alert(response.message);
+                        closeReportModal();
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function() {
+                    alert('Error submitting report');
+                }
+            });
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            if (event.target.id === 'commentModal') {
+                closeCommentModal();
+            }
+            if (event.target.id === 'reportModal') {
+                closeReportModal();
+            }
+        }
+    </script>
+}
+     

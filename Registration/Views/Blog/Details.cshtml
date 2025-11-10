@@ -1,0 +1,533 @@
+﻿@model BlogDetailsViewModel
+@{
+    ViewData["Title"] = Model.Blog.Title + " - Bloglytics";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <style>
+        .details-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .blog-detail-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .blog-detail-header {
+            padding: 30px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .blog-detail-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+            line-height: 1.3;
+        }
+
+        .blog-detail-meta {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .author-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+
+        .author-avatar-large {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .author-details {
+            flex: 1;
+        }
+
+        .author-name-large {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .post-date {
+            font-size: 14px;
+            color: #999;
+        }
+
+        .follow-btn-large {
+            padding: 12px 30px;
+            border-radius: 25px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+            .follow-btn-large:hover {
+                background: #667eea;
+                color: white;
+            }
+
+            .follow-btn-large.following {
+                background: #667eea;
+                color: white;
+            }
+
+        .category-badge-large {
+            display: inline-block;
+            padding: 8px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .blog-detail-image {
+            width: 100%;
+            max-height: 500px;
+            object-fit: cover;
+        }
+
+        .blog-detail-content {
+            padding: 40px;
+            font-size: 18px;
+            line-height: 1.8;
+            color: #444;
+        }
+
+            .blog-detail-content p {
+                margin-bottom: 20px;
+            }
+
+        .blog-stats {
+            display: flex;
+            gap: 30px;
+            padding: 20px 40px;
+            border-top: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+        }
+
+            .stat-item i {
+                color: #667eea;
+            }
+
+        .blog-actions-large {
+            display: flex;
+            gap: 15px;
+            padding: 30px 40px;
+        }
+
+        .action-btn-large {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            color: #666;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+            .action-btn-large:hover {
+                border-color: #667eea;
+                color: #667eea;
+                background: #f8f9fa;
+            }
+
+            .action-btn-large.liked {
+                border-color: #e74c3c;
+                color: #e74c3c;
+                background: #fff5f5;
+            }
+
+            .action-btn-large i {
+                font-size: 20px;
+            }
+
+        .comments-section {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+
+        .comments-header {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: #333;
+        }
+
+        .comment-form {
+            margin-bottom: 30px;
+        }
+
+        .comment-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            resize: vertical;
+            min-height: 100px;
+            margin-bottom: 15px;
+        }
+
+            .comment-input:focus {
+                outline: none;
+                border-color: #667eea;
+            }
+
+        .btn-post-comment {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+            .btn-post-comment:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            }
+
+        .comment-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+            .comment-item:last-child {
+                border-bottom: none;
+            }
+
+        .comment-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .comment-content-wrapper {
+            flex: 1;
+        }
+
+        .comment-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .comment-date {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .comment-text {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .no-comments {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+            .no-comments i {
+                font-size: 60px;
+                margin-bottom: 15px;
+                opacity: 0.3;
+            }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            color: #666;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+            .back-btn:hover {
+                border-color: #667eea;
+                color: #667eea;
+            }
+    </style>
+}
+
+<div class="details-container">
+    <a href="@Url.Action("Index", "Blog")" class="back-btn">
+        <i class="fas fa-arrow-left"></i> Back to Feed
+    </a>
+
+    <div class="blog-detail-card">
+        <div class="blog-detail-header">
+            <div class="category-badge-large">@Model.Blog.CategoryName</div>
+            <h1 class="blog-detail-title">@Model.Blog.Title</h1>
+
+            <div class="blog-detail-meta">
+                <div class="author-section">
+                    <img src="@(Model.Blog.AuthorProfilePicture ?? "/images/default-avatar.png")"
+                         class="author-avatar-large"
+                         alt="@Model.Blog.AuthorName">
+                    <div class="author-details">
+                        <div class="author-name-large">@Model.Blog.AuthorName</div>
+                        <div class="post-date">@Model.Blog.CreatedAt.ToString("MMMM dd, yyyy")</div>
+                    </div>
+                </div>
+                @if (Model.Blog.UserId.ToString() != Context.Session.GetString("UserId"))
+                {
+                    <button class="follow-btn-large @(Model.IsFollowing ? "following" : "")"
+                            onclick="toggleFollow(@Model.Blog.UserId, this)">
+                        @(Model.IsFollowing ? "Following" : "Follow")
+                    </button>
+                }
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.Blog.ImageUrl))
+        {
+            <img src="@Model.Blog.ImageUrl" class="blog-detail-image" alt="@Model.Blog.Title">
+        }
+
+        <div class="blog-detail-content">
+            @Html.Raw(Model.Blog.Content.Replace("\n", "<br/>"))
+        </div>
+
+        <div class="blog-stats">
+            <div class="stat-item">
+                <i class="fas fa-eye"></i>
+                <span>@Model.Blog.ViewCount views</span>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-heart"></i>
+                <span>@Model.Blog.LikeCount likes</span>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-comment"></i>
+                <span>@Model.Blog.CommentCount comments</span>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-share"></i>
+                <span>@Model.Blog.ShareCount shares</span>
+            </div>
+        </div>
+
+        <div class="blog-actions-large">
+            <button class="action-btn-large @(Model.IsLiked ? "liked" : "")"
+                    onclick="toggleLike(@Model.Blog.BlogId, this)">
+                <i class="fas fa-heart"></i>
+                <span>Like</span>
+            </button>
+            <button class="action-btn-large" onclick="focusCommentInput()">
+                <i class="fas fa-comment"></i>
+                <span>Comment</span>
+            </button>
+            <button class="action-btn-large" onclick="sharePost(@Model.Blog.BlogId)">
+                <i class="fas fa-share"></i>
+                <span>Share</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="comments-section">
+        <h2 class="comments-header">
+            Comments (@Model.Comments.Count)
+        </h2>
+
+        <div class="comment-form">
+            <textarea id="newCommentText" class="comment-input" placeholder="Write a comment..."></textarea>
+            <button class="btn-post-comment" onclick="addComment()">Post Comment</button>
+        </div>
+
+        <div id="commentsContainer">
+            @if (Model.Comments.Any())
+            {
+                foreach (var comment in Model.Comments)
+                {
+                    <div class="comment-item">
+                        <img src="@(comment.UserProfilePicture ?? "/images/default-avatar.png")"
+                             class="comment-avatar"
+                             alt="@comment.UserName">
+                        <div class="comment-content-wrapper">
+                            <div class="comment-header">
+                                <span class="comment-author">@comment.UserName</span>
+                                <span class="comment-date">@comment.CreatedAt.ToString("MMM dd, yyyy")</span>
+                            </div>
+                            <div class="comment-text">@comment.Content</div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="no-comments">
+                    <i class="fas fa-comments"></i>
+                    <p>No comments yet. Be the first to comment!</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const blogId = @Model.Blog.BlogId;
+
+        function focusCommentInput() {
+            $('#newCommentText').focus();
+        }
+
+        function toggleLike(blogId, button) {
+            const isLiked = $(button).hasClass('liked');
+            const endpoint = isLiked ? '/Blog/Unlike' : '/Blog/Like';
+
+            $.ajax({
+                url: endpoint,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(blogId),
+                success: function(response) {
+                    if (response.success) {
+                        if (isLiked) {
+                            $(button).removeClass('liked');
+                        } else {
+                            $(button).addClass('liked');
+                        }
+                        // Reload to update count
+                        location.reload();
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function() {
+                    alert('Error processing like');
+                }
+            });
+        }
+
+        function addComment() {
+            const content = $('#newCommentText').val().trim();
+
+            if (!content) {
+                alert('Please enter a comment');
+                return;
+            }
+
+            const commentData = {
+                blogId: blogId,
+                content: content
+            };
+
+            $.ajax({
+                url: '/Blog/AddComment',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(commentData),
+                success: function(response) {
+                    if (response.success) {
+                        // Reload to show new comment
+                        location.reload();
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function() {
+                    alert('Error adding comment');
+                }
+            });
+        }
+
+        function sharePost(blogId) {
+            const blogUrl = window.location.href;
+
+            navigator.clipboard.writeText(blogUrl).then(function() {
+                $.ajax({
+                    url: '/Blog/RecordShare',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(blogId),
+                    success: function(response) {
+                        alert('Link copied to clipboard!');
+                    }
+                });
+            }).catch(function() {
+                alert('Failed to copy link');
+            });
+        }
+
+        function toggleFollow(authorUserId, button) {
+            const isFollowing = $(button).hasClass('following');
+            const endpoint = isFollowing ? '/Blog/UnfollowUser' : '/Blog/FollowUser';
+
+            $.ajax({
+                url: endpoint,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(authorUserId),
+                success: function(response) {
+                    if (response.success) {
+                        if (isFollowing) {
+                            $(button).removeClass('following').text('Follow');
+                        } else {
+                            $(button).addClass('following').text('Following');
+                        }
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function() {
+                    alert('Error processing follow request');
+                }
+            });
+        }
+    </script>
+}
