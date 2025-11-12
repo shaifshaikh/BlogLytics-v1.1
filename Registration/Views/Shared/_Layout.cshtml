@@ -266,9 +266,11 @@
                 <a href="@Url.Action("Index", "Blog")">
                     <i class="fas fa-home"></i> Home
                 </a>
-                <a href="@Url.Action("Trending", "Blog")">
+                <a data-filter="trending"  href="@Url.Action("Index", "Blog")">
                     <i class="fas fa-fire"></i> Trending
                 </a>
+
+
                 <a href="@Url.Action("MyBlogs", "Blog")">
                     <i class="fas fa-blog"></i> My Blogs
                 </a>

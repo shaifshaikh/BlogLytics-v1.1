@@ -39,6 +39,8 @@ namespace Registration.Repository
                     INSERT INTO Users (Email, PasswordHash, FullName, Role, IsActive, EmailConfirmed, CreatedAt)
                     VALUES (@Email, @Password, @FullName, 'Blogger', 1, 1, @CreatedAt)";
 
+
+
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
                     cmd.Parameters.AddWithValue("@Email", email);

@@ -340,7 +340,7 @@
 }
 
 <div class="feed-container">
-    <div class="filter-tabs">
+   @*  <div class="filter-tabs">
         <button class="filter-tab active" data-filter="all">
             <i class="fas fa-home"></i> For You
         </button>
@@ -350,7 +350,7 @@
         <button class="filter-tab" data-filter="following">
             <i class="fas fa-users"></i> Following
         </button>
-    </div>
+    </div> *@
 
     <div id="feedContainer">
         <div class="loading-spinner">
@@ -458,6 +458,7 @@
             isLoading = true;
 
             let endpoint = '/Blog/GetFeed';
+            debugger;
             if (currentFilter === 'trending') {
                 endpoint = '/Blog/Trending';
             }
@@ -500,6 +501,7 @@
         }
 
         function renderBlogCard(blog) {
+            debugger;
             const excerpt = blog.content.length > 200 ? blog.content.substring(0, 200) + '...' : blog.content;
             const imageHtml = blog.imageUrl ? `<img src="${blog.imageUrl}" class="blog-image" alt="${blog.title}">` : '';
             const avatarUrl = blog.authorProfilePicture || '/images/default-avatar.png';
@@ -653,7 +655,7 @@
       
 
 
-        ==================== SHARE FUNCTIONALITY ====================
+        //==================== SHARE FUNCTIONALITY ====================
         function sharePost(blogId) {
             const blogUrl = `${window.location.origin}/Blog/Details/${blogId}`;
             

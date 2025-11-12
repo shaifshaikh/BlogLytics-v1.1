@@ -47,7 +47,7 @@ namespace Registration.Repository
                 await conn.OpenAsync();
 
                 string query = @"
-                    SELECT b.*, u.FullName as AuthorName, u.ProfilePicture as AuthorProfilePicture, 
+                    SELECT b.*, u.FullName as AuthorName, u.ProfileImage as AuthorProfilePicture, 
                            c.CategoryName
                     FROM Blogs b
                     INNER JOIN Users u ON b.UserId = u.UserId
@@ -84,7 +84,7 @@ namespace Registration.Repository
                         SELECT 
                             b.*,
                             u.FullName as AuthorName,
-                            u.ProfilePicture as AuthorProfilePicture,
+                            u.ProfileImage as AuthorProfilePicture,
                             c.CategoryName,
                             -- Calculate Score
                             (
@@ -166,7 +166,7 @@ namespace Registration.Repository
                 await conn.OpenAsync();
 
                 string query = @"
-                    SELECT b.*, u.FullName as AuthorName, u.ProfilePicture as AuthorProfilePicture, 
+                    SELECT b.*, u.FullName as AuthorName, u.ProfileImage as AuthorProfilePicture, 
                            c.CategoryName,
                            (b.LikeCount + b.CommentCount * 2 + b.ShareCount * 3 + b.ViewCount * 0.1) AS TrendingScore
                     FROM Blogs b
@@ -204,7 +204,7 @@ namespace Registration.Repository
                 await conn.OpenAsync();
 
                 string query = @"
-                    SELECT b.*, u.FullName as AuthorName, u.ProfilePicture as AuthorProfilePicture, 
+                    SELECT b.*, u.FullName as AuthorName, u.ProfileImageas AuthorProfilePicture, 
                            c.CategoryName
                     FROM Blogs b
                     INNER JOIN Users u ON b.UserId = u.UserId
@@ -241,7 +241,7 @@ namespace Registration.Repository
                 await conn.OpenAsync();
 
                 string query = @"
-                    SELECT b.*, u.FullName as AuthorName, u.ProfilePicture as AuthorProfilePicture, 
+                    SELECT b.*, u.FullName as AuthorName, u.ProfileImage as AuthorProfilePicture, 
                            c.CategoryName
                     FROM Blogs b
                     INNER JOIN Users u ON b.UserId = u.UserId

@@ -32,6 +32,7 @@ namespace Registration.Controllers
 
         [HttpGet]
         public IActionResult Login()
+        
         {
             if (HttpContext.Session.GetString("UserId") != null)
             {
@@ -87,7 +88,7 @@ namespace Registration.Controllers
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Invalid email or password.");
-                    TempData["ErrorMessage"] = "Invalid email or password. Please try again.";
+                    //TempData["ErrorMessage"] = "Invalid email or password. Please try again.";
                     return View("Index", model);
                 }
             }
