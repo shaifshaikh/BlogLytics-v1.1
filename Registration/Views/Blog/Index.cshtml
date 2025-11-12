@@ -453,52 +453,107 @@
             });
         });
 
+        // function loadFeed(append = false) {
+        //     if (isLoading) return;
+        //     isLoading = true;
+
+        //     let endpoint = '/Blog/GetFeed';
+        //     debugger;
+        //     if (currentFilter === 'trending') {
+        //         endpoint = '/Blog/Trending';
+        //     }
+
+        //     $.ajax({
+        //         url: endpoint,
+        //         type: 'GET',
+        //         data: { page: currentPage, pageSize: 10 },
+        //         success: function(response) {
+        //             if (response.success) {
+        //                 if (!append) {
+        //                     $('#feedContainer').html('');
+        //                 }
+
+        //                 if (response.blogs.length === 0 && currentPage === 1) {
+        //                     $('#feedContainer').html(`
+        //                         <div class="no-blogs">
+        //                             <i class="fas fa-newspaper"></i>
+        //                             <h3>No blogs yet</h3>
+        //                             <p>Start creating content or follow users to see their blogs here!</p>
+        //                         </div>
+        //                     `);
+        //                 } else {
+        //                     response.blogs.forEach(blog => {
+        //                         renderBlogCard(blog);
+        //                     });
+        //                 }
+
+        //                 hasNextPage = response.hasNextPage;
+        //             } 
+        //             else {
+        //                 alert(response.message);
+        //             }
+
+        //             isLoading = false;
+        //         },
+         
+        //         error: function(xhr) {
+        //             alert('Error loading feed');
+        //             isLoading = false;
+        //         }
+        //     });
+        // }
         function loadFeed(append = false) {
-            if (isLoading) return;
-            isLoading = true;
+    if (isLoading) return;
+    isLoading = true;
 
-            let endpoint = '/Blog/GetFeed';
-            debugger;
-            if (currentFilter === 'trending') {
-                endpoint = '/Blog/Trending';
+    let endpoint = '/Blog/GetFeed';
+    debugger;
+    if (currentFilter === 'trending') {
+        endpoint = '/Blog/Trending';
+    }
+
+    $.ajax({
+        url: endpoint,
+        type: 'GET',
+        data: { page: currentPage, pageSize: 10 },
+        success: function(response) {
+            if (response.success) {
+                if (!response.success && response.message === "User not authenticated") {
+                window.location.href = '/Account/Login';
+                return;
             }
-
-            $.ajax({
-                url: endpoint,
-                type: 'GET',
-                data: { page: currentPage, pageSize: 10 },
-                success: function(response) {
-                    if (response.success) {
-                        if (!append) {
-                            $('#feedContainer').html('');
-                        }
-
-                        if (response.blogs.length === 0 && currentPage === 1) {
-                            $('#feedContainer').html(`
-                                <div class="no-blogs">
-                                    <i class="fas fa-newspaper"></i>
-                                    <h3>No blogs yet</h3>
-                                    <p>Start creating content or follow users to see their blogs here!</p>
-                                </div>
-                            `);
-                        } else {
-                            response.blogs.forEach(blog => {
-                                renderBlogCard(blog);
-                            });
-                        }
-
-                        hasNextPage = response.hasNextPage;
-                    } else {
-                        alert(response.message);
-                    }
-                    isLoading = false;
-                },
-                error: function(xhr) {
-                    alert('Error loading feed');
-                    isLoading = false;
+                if (!append) {
+                    $('#feedContainer').html('');
                 }
-            });
+
+                if (response.blogs.length === 0 && currentPage === 1) {
+                    $('#feedContainer').html(`
+                        <div class="no-blogs">
+                            <i class="fas fa-newspaper"></i>
+                            <h3>No blogs yet</h3>
+                            <p>Start creating content or follow users to see their blogs here!</p>
+                        </div>
+                    `);
+                } else {
+                    response.blogs.forEach(blog => {
+                        renderBlogCard(blog);
+                    });
+                }
+
+                hasNextPage = response.hasNextPage;
+            } else {
+                    alert(response.message);
+                }
+            
+
+            isLoading = false; // ✅ keep this inside success block
+        },
+        error: function(xhr) {
+            alert('Error loading feed');
+            isLoading = false;
         }
+    });
+}
 
         function renderBlogCard(blog) {
             debugger;

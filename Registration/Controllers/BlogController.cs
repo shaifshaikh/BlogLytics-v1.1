@@ -88,6 +88,22 @@ namespace Registration.Controllers
         {
             try
             {
+                var userId = HttpContext.Session.GetString("UserId");
+                var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest";
+
+                if (string.IsNullOrEmpty(userId))
+                {
+                    if (isAjax)
+                    {
+                        // AJAX call → return JSON for your JavaScript handler
+                        return Json(new { success = false, message = "User not authenticated" });
+                    }
+                    else
+                    {
+                        // Direct browser hit → redirect to login page instead of showing JSON
+                        return RedirectToAction("Login", "Account");
+                    }
+                }
                 var blogs = await _blogRepository.GetTrendingBlogsAsync(page, pageSize);
                 var totalBlogs = await _blogRepository.GetTotalBlogsCountAsync();
                 var totalPages = (int)Math.Ceiling(totalBlogs / (double)pageSize);
